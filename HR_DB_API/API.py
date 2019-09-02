@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 #from sqlalchemy import create_engine
 
-from DBOperations import createNewDepartment, getAllDepartments, getAllEmployees, createNewEmployee
+from DBOperations import createNewDepartment, getAllDepartments, getAllEmployees, createNewEmployee, getLeaves, createNewNocReq, getJobOpenings
 
 from json import dumps
 import psycopg2
@@ -66,7 +66,7 @@ def create_New_Emp():
 
         createNewEmployee(fname, lname, phone, email, st_date, role, location, dept)
 
-    finally:
+    except:
        status = "Error"
        print("An Error has occured.")
 
@@ -80,10 +80,64 @@ def get_All_Emp():
     try:
         data = getAllEmployees()
 
-    finally:
+    except:
        print("Error")
 
     
+    return jsonify(data)
+
+
+
+## get leaves info
+## Usage: http://127.0.0.1:5002/GetLeaves/?epmloyeeid=epmloyeeid
+@app.route('/GetLeaves/', methods=['GET'])
+def get_Leaves():  
+
+    try:
+        epmloyeeID = request.args.get('epmloyeeid')
+        data = getLeaves(epmloyeeID)
+
+    except:
+       print("An Error has occured.")
+
+
+    return jsonify(data)
+
+
+## Create a new NOC request
+## Usage: http://127.0.0.1:5002/CreateNocReq/?req-purpose=req-purpose&noc-id=noc-id&emp-id=emp-id
+@app.route('/CreateNocReq/', methods=['GET'])
+def create_New_NOC_Req():  
+
+    status = "Success"
+
+    try:
+        req_purpose = request.args.get('req-purpose')
+        noc_ID   = request.args.get('noc-id')
+        emp_ID  = request.args.get('emp-id')
+
+
+        createNewNocReq(req_purpose  , noc_ID  , emp_ID )
+
+    except:
+       status = "Error"
+       print("An Error has occured.")
+
+    return status
+
+
+## get openings info
+## Usage: http://127.0.0.1:5002/GetJobOpenings
+@app.route('/GetJobOpenings/', methods=['GET'])
+def get_Job_Openings():  
+
+    try:
+        data = getJobOpenings()
+
+    except:
+       print("An Error has occured.")
+
+
     return jsonify(data)
 
 
